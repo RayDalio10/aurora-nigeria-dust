@@ -93,3 +93,43 @@ def plot_scatter(x, y, xlabel, ylabel, fname, title="", log=False):
     fig.tight_layout()
     fig.savefig(os.path.join(FIG_DIR, fname), dpi=150, bbox_inches="tight")
     return fig
+
+
+def plot_three_year_day3(runs, fname, day_step=5):
+    """Three-panel Day-3 comparison across years.
+
+    runs: list of (label, preds, atm) tuples. day_step is the rollout step
+    for ~Day 3 (step 5). Saves a side-by-side comparison figure.
+    """
+    _ensure_dir()
+    fig, axes = plt.subplots(1, len(runs), figsize=(6 * len(runs), 6))
+    for ax, (label, preds, atm) in zip(axes, runs):
+        pm10 = preds[day_step].surf_vars["pm10"][0, 0].numpy()
+        im = ax.pcolormesh(atm.longitude.values, atm.latitude.values, pm10,
+                           cmap="YlOrBr", shading="auto")
+        ax.set_title(f"{label}  (Day 3)")
+        ax.set_xlabel("Lon E")
+        ax.set_ylabel("Lat N")
+        fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
+    fig.suptitle("Aurora PM10 dust over Nigeria - Day 3 forecast, three Harmattan seasons",
+                 fontsize=14)
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG_DIR, fname), dpi=150, bbox_inches="tight")
+    return fig
+
+
+def plot_scatter_map(lons, lats, values, title, fname,
+                     cbar_label="value", extent=(2, 15, 3, 16)):
+    """Scatter plot of per-pixel values on a lon/lat map (e.g. satellite AAI)."""
+    _ensure_dir()
+    fig, ax = plt.subplots(figsize=(8, 7))
+    sc = ax.scatter(lons, lats, c=values, cmap="YlOrBr", s=40, marker="s")
+    ax.set_title(title)
+    ax.set_xlabel("Longitude E")
+    ax.set_ylabel("Latitude N")
+    ax.set_xlim(extent[0], extent[1])
+    ax.set_ylim(extent[2], extent[3])
+    fig.colorbar(sc, ax=ax, label=cbar_label)
+    fig.savefig(os.path.join(FIG_DIR, fname), dpi=150, bbox_inches="tight")
+    return fig
+    
