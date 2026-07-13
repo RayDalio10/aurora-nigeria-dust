@@ -6,7 +6,7 @@ saved to figures/ via savefig, never display-only):
   2. Three-year Day-3 comparison (2024 / 2025 / 2026)
   3. Sentinel-5P AAI satellite map (15 Jan 2024)
   4. Forecast-vs-observation side-by-side (regridded) for 15 Jan 2024
-  5. CAMS-vs-MODIS spatial comparison + raw/log scatter (24 Jan 2024 window)
+  5. CAMS-vs-MODIS spatial comparison map + raw/log scatter (24 Jan 2024 window)
   6. Skill-vs-lead-time curve (the headline result)
   7. Event-detection scores (printed)
 
@@ -86,16 +86,37 @@ def main():
                         "Aurora PM10 (regridded)", "Sentinel-5P AAI (regridded)",
                         "forecast_vs_obs_2024.png")
 
-    # ---- 5. CAMS dust-AOD vs MODIS AOD (24 Jan window) + scatter ----
-    # CAMS dust-AOD composite (download separately or reuse; here single day for brevity)
-    # For the robust comparison, use temporal composites (see validation notes).
+    # ---- 5. CAMS dust-AOD vs MODIS AOD (24 Jan window), map + scatter ----
+    # Both are temporal composites over the same +/- 15-day window, matched in
+    # time and coverage. This is the like-for-like AOD-vs-AOD comparison.
+    forecast.download_cams_dustaod("2024-01-09/2024-02-08", "cams_dustaod_window.zip")
+    c_lons, c_lats, c_field = forecast.load_cams_dustaod(
+        "cams_dustaod_window.zip", "cams_dustaod_window")
+    cams_grid = val.regrid_gridded(c_lons, c_lats, c_field, cell=1.0, min_points=1)
+
     cb_lons, cb_lats, cb_aod = satellite.get_modis_aod_composite(
         DUST_DAY, window_days=15,
         aod_var=satellite.MODIS_AOD_COMBINED,
         qa_var=satellite.MODIS_AOD_COMBINED_QA, qa_min=1)
     modis_grid = val.regrid_points(cb_lons, cb_lats, cb_aod, cell=1.0, min_points=3)
-    # (CAMS dust-AOD field for the same window should be loaded and regridded here;
-    #  see docs/methods for the compositing step. Scatter uses the paired boxes.)
+
+    # Side-by-side composite comparison map
+    plots.plot_two_maps(cams_grid, modis_grid,
+                        "CAMS composite dust-AOD", "MODIS composite AOD",
+                        "cams_vs_modis_2024.png")
+
+    # Spatial correlation (log-space, since AOD is log-normal) + scatter
+    r_log, n_log = val.spatial_correlation(cams_grid, modis_grid, log=True)
+    r_spear, _ = val.spatial_correlation(cams_grid, modis_grid, method="spearman")
+    print(f"CAMS vs MODIS spatial: log-Pearson {r_log}, Spearman {r_spear}, n={n_log}")
+
+    a = cams_grid.ravel()
+    b = modis_grid.ravel()
+    both = np.isfinite(a) & np.isfinite(b) & (a > 0) & (b > 0)
+    plots.plot_scatter(a[both], b[both], "CAMS dust-AOD", "MODIS Combined AOD",
+                       "cams_vs_modis_scatter_raw.png", title="Raw AOD")
+    plots.plot_scatter(a[both], b[both], "log(CAMS)", "log(MODIS)",
+                       "cams_vs_modis_scatter_log.png", title="Log AOD", log=True)
 
     # ---- 6. Skill-vs-lead-time curve (headline) ----
     start_days = [(datetime(2024, 1, 7) + timedelta(days=2 * i)).strftime("%Y-%m-%d")
