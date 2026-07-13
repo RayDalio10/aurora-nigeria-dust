@@ -1,0 +1,81 @@
+"""Reproduce the January 2024 case study end to end and save all figures.
+
+Prerequisites (once per environment):
+  - Copernicus ADS credentials: set CDSAPI_URL and CDSAPI_KEY env vars,
+    then credentials.write_cdsapirc_from_env() writes ~/.cdsapirc.
+  - Earthdata: run satellite.init_earthdata() once (interactive login).
+  - Earth Engine: run satellite.init_earth_engine() once.
+  - GPU required for Aurora inference.
+
+Run:  python run_case_study.py
+Outputs: figures/*.png and printed metrics.
+"""
+from datetime import datetime, timedelta
+
+import numpy as np
+import xarray as xr
+
+import credentials
+import forecast
+import satellite
+import validation as val
+import plots
+
+CASE_DATE = "2024-01-15"
+DUST_DAY = "2024-01-24"
+
+
+def main():
+    credentials.write_cdsapirc_from_env()
+    satellite.init_earth_engine()
+    satellite.init_earthdata()
+
+    # 1. A single forecast + its 5-day evolution figure
+    preds, atm = forecast.run_aurora_forecast(CASE_DATE, steps=10)
+    lons, lats = atm.longitude.values, atm.latitude.values
+    plots.plot_forecast_panels(preds, lons, lats, CASE_DATE,
+                               "forecast_5day_2024-01-15.png")
+
+    # 2. Lead-time skill curve (the headline result)
+    start_days = [(datetime(2024, 1, 7) + timedelta(days=2 * i)).strftime("%Y-%m-%d")
+                  for i in range(10)]
+    forecast_by_lead = {lead: [] for lead in (1, 2, 3, 4, 5)}
+    for sd in start_days:
+        p, a = forecast.run_aurora_forecast(sd, steps=10)
+        for lead in (1, 2, 3, 4, 5):
+            step = lead * 2 - 1
+            pm = p[step].surf_vars["pm10"][0, 0].numpy()
+            vdate = (datetime.strptime(sd, "%Y-%m-%d")
+                     + timedelta(days=lead)).strftime("%Y-%m-%d")
+            forecast_by_lead[lead].append((vdate, float(np.nanmean(pm))))
+
+    cache = {}
+    def modis_mean(d):
+        if d not in cache:
+            lo, la, ao = satellite.get_modis_aod(
+                d, aod_var=satellite.MODIS_AOD_COMBINED,
+                qa_var=satellite.MODIS_AOD_COMBINED_QA, qa_min=1)
+            cache[d] = float(np.nanmean(ao)) if ao is not None and len(ao) else np.nan
+        return cache[d]
+
+    skill = val.skill_vs_lead_time(forecast_by_lead, modis_mean)
+    leads = [1, 2, 3, 4, 5]
+    pear = [skill[l]["pearson"] for l in leads]
+    spear = [skill[l]["spearman"] for l in leads]
+    for l in leads:
+        print(f"Lead {l}d: Pearson {skill[l]['pearson']}, "
+              f"Spearman {skill[l]['spearman']}, n={skill[l]['n']}")
+    plots.plot_skill_vs_leadtime(leads, pear, spear)
+
+    # 3. Event detection at 2-day lead
+    pairs = forecast_by_lead[2]
+    fc = np.array([v for (_, v) in pairs])
+    ob = np.array([modis_mean(d) for (d, _) in pairs])
+    ev = val.event_detection(fc, ob, percentile=70)
+    print("Event detection (2-day lead):", ev)
+
+    print("Done. Figures saved in figures/.")
+
+
+if __name__ == "__main__":
+    main()
