@@ -1,0 +1,12 @@
+microsoft-aurora
+cdsapi
+earthengine-api
+earthaccess
+huggingface_hub
+pyhdf
+xarray
+netCDF4
+numpy
+scipy
+matplotlib
+torch
