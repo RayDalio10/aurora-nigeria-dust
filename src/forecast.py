@@ -42,6 +42,57 @@ def download_cams(date, out_zip):
     print(f"Downloaded {out_zip}")
 
 
+def download_cams_dustaod(date_range, out_zip):
+    """Download CAMS dust aerosol optical depth (duaod550) for a date range.
+
+    date_range is a string "YYYY-MM-DD/YYYY-MM-DD" (a single day uses the same
+    date twice). Used as the CAMS reference for the CAMS-vs-MODIS comparison.
+    Surface variable only (no pressure levels), so this is a light download.
+    """
+    if os.path.exists(out_zip):
+        print(f"{out_zip} already exists, skipping download.")
+        return
+    client = cdsapi.Client()
+    client.retrieve(
+        "cams-global-atmospheric-composition-forecasts",
+        {
+            "variable": ["dust_aerosol_optical_depth_550nm"],
+            "date": date_range,
+            "time": ["12:00"],
+            "leadtime_hour": "0",
+            "type": "forecast",
+            "data_format": "netcdf_zip",
+        },
+        out_zip,
+    )
+    print(f"Downloaded {out_zip}")
+
+
+def load_cams_dustaod(zip_path, extract_dir):
+    """Unzip a CAMS dust-AOD download and return the mean field cropped to
+    Nigeria, sorted to ascending latitude.
+
+    Returns (lons, lats, mean_field_2d) ready for regridding. Averages over
+    all forecast reference times in the file (temporal composite).
+    """
+    with zipfile.ZipFile(zip_path, "r") as zf:
+        zf.extractall(extract_dir)
+    ds = xr.open_dataset(f"{extract_dir}/data_sfc.nc")
+    if "forecast_period" in ds.dims:
+        ds = ds.isel(forecast_period=0)
+    b = NIGERIA_BOUNDS
+    ds = ds.sel(latitude=slice(b["lat_max"], b["lat_min"]),
+                longitude=slice(b["lon_min"], b["lon_max"]))
+    duaod = ds["duaod550"]
+    # Average over any time-like dimension to get one (lat, lon) field
+    time_dims = [d for d in duaod.dims if d not in ("latitude", "longitude")]
+    if time_dims:
+        duaod = duaod.mean(dim=time_dims)
+    # Sort ascending latitude so it aligns with the grid convention
+    duaod = duaod.sortby("latitude")
+    return duaod.longitude.values, duaod.latitude.values, np.asarray(duaod)
+
+
 def load_and_crop(zip_path, extract_dir):
     """Unzip CAMS data and crop to the Nigeria domain.
 
@@ -139,3 +190,4 @@ def run_aurora_forecast(date, steps=10):
         preds = [p.to("cpu") for p in rollout(model, batch, steps=steps)]
     print(f"Forecast for {date} done: {len(preds)} steps.")
     return preds, atm
+    
