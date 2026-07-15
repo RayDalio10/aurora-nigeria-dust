@@ -1,90 +1,55 @@
-# Aurora Nigeria Dust — Harmattan Dust Forecasting and Validation
+Aurora Nigeria Dust — Harmattan Dust Forecasting and Validation
+Evaluating whether the Aurora Earth-system foundation model can forecast Harmattan dust over Nigeria with enough skill to support early warning.
 
-Evaluating whether the Aurora Earth-system foundation model can forecast
-Harmattan dust over Nigeria with enough skill to support early warning.
+Summary
+Using the pre-trained Aurora 0.4-degree air-pollution model (inference only), this project forecasts dust (PM10) over Nigeria from CAMS input data and validates the forecasts against independent satellite observations (MODIS aerosol optical depth; Sentinel-5P Absorbing Aerosol Index).
 
-## Summary
+Preliminary result (single-season case study, January 2024): Aurora's region-averaged dust forecast correlates with MODIS observations by lead time at approximately Day 1 r=0.93, Day 2 r=0.81, Day 3 r=0.48, Day 4 r=0.11, Day 5 r=-0.30 (n=10) - a useful early-warning horizon of about 1-3 days. These results are preliminary and to be confirmed across multiple seasons.
 
-Using the pre-trained Aurora 0.4-degree air-pollution model (inference only),
-this project forecasts dust (PM10) over Nigeria from CAMS input data and
-validates the forecasts against independent satellite observations
-(MODIS aerosol optical depth; Sentinel-5P Absorbing Aerosol Index).
-
-Preliminary result (single-season case study, January 2024): Aurora's
-region-averaged dust forecast correlates with MODIS observations by lead time
-at approximately Day 1 r=0.93, Day 2 r=0.81, Day 3 r=0.48, Day 4 r=0.11,
-Day 5 r=-0.30 (n=10) - a useful early-warning horizon of about 1-3 days.
-These results are preliminary and to be confirmed across multiple seasons.
-
-## Data sources
-
-- CAMS global atmospheric-composition forecasts (Copernicus ADS) - model input and dust-AOD reference.
-- Aurora checkpoint aurora-0.4-air-pollution.ckpt (Hugging Face microsoft/aurora). Weights are CC-BY-NC-SA (non-commercial).
-- MODIS MOD04_L2 AOD (NASA Earthdata) - Dark Target / Deep Blue Combined product.
-- Sentinel-5P Absorbing Aerosol Index (Google Earth Engine).
-
-## Setup
-
-1. Install dependencies: `pip install -r requirements.txt`.
-2. Copernicus ADS: set env vars `CDSAPI_URL` and `CDSAPI_KEY` (get a free key from the ADS site).
-3. NASA Earthdata: register at urs.earthdata.nasa.gov; first run calls an interactive login.
-4. Google Earth Engine: register a project; set EE_PROJECT in src/config.py.
-5. A GPU is required for Aurora inference (the region is cropped to Nigeria to fit free-tier GPUs).
-
-## Usage
-
+Data sources
+CAMS global atmospheric-composition forecasts (Copernicus ADS) - model input and dust-AOD reference.
+Aurora checkpoint aurora-0.4-air-pollution.ckpt (Hugging Face microsoft/aurora). Weights are CC-BY-NC-SA (non-commercial).
+MODIS MOD04_L2 AOD (NASA Earthdata) - Dark Target / Deep Blue Combined product.
+Sentinel-5P Absorbing Aerosol Index (Google Earth Engine).
+Setup
+Install dependencies: pip install -r requirements.txt.
+Copernicus ADS: set env vars CDSAPI_URL and CDSAPI_KEY (get a free key from the ADS site).
+NASA Earthdata: register at urs.earthdata.nasa.gov; first run calls an interactive login.
+Google Earth Engine: register a project; set EE_PROJECT in src/config.py.
+A GPU is required for Aurora inference (the region is cropped to Nigeria to fit free-tier GPUs).
+Usage
 python run_case_study.py
 
+This produces the forecast panels, the skill-vs-lead-time curve, and the event-detection scores; figures are saved in figures/.
 
-This produces the forecast panels, the skill-vs-lead-time curve, and the
-event-detection scores; figures are saved in figures/.
+Repository layout
+src/config.py - region, variables, grid constants
+src/credentials.py - safe credential handling (no keys in source)
+src/forecast.py - Aurora forecast pipeline
+src/satellite.py - Sentinel-5P AAI and MODIS AOD retrieval
+src/validation.py - regridding, spatial/temporal correlation, lead-time skill, event detection
+src/plots.py - figure generation (saves to figures/)
+run_case_study.py - end-to-end example
+Results
+Forecast skill decays with lead time (the headline result). Aurora's region-averaged dust forecast agrees strongly with satellite observations at 1-2 days and loses skill by day 4-5:
 
-## Repository layout
+Aurora dust forecast skill vs lead time over Nigeria (January 2024)
 
-- src/config.py - region, variables, grid constants
-- src/credentials.py - safe credential handling (no keys in source)
-- src/forecast.py - Aurora forecast pipeline
-- src/satellite.py - Sentinel-5P AAI and MODIS AOD retrieval
-- src/validation.py - regridding, spatial/temporal correlation, lead-time skill, event detection
-- src/plots.py - figure generation (saves to figures/)
-- run_case_study.py - end-to-end example
+Example 5-day dust forecast evolution over Nigeria (15 January 2024 initialization), showing the Harmattan plume building in the north and being transported over the region:
 
-## Results
+Aurora PM10 5-day dust forecast evolution over Nigeria, 15 January 2024
 
-Forecast skill decays with lead time (the headline result). Aurora's region-averaged
-dust forecast agrees strongly with satellite observations at 1-2 days and loses skill by day 4-5:
+Validation reference: CAMS dust aerosol optical depth compared with MODIS Combined aerosol optical depth over Nigeria (temporal composites, January 2024):
 
-![Aurora dust forecast skill vs lead time over Nigeria (January 2024)](figures/skill_vs_leadtime.png)
+CAMS dust-AOD vs MODIS Combined AOD composite over Nigeria
 
-Example 5-day dust forecast evolution over Nigeria (15 January 2024 initialization),
-showing the Harmattan plume building in the north and being transported over the region:
+All figures are regenerated by running python run_case_study.py.
 
-![Aurora PM10 5-day dust forecast evolution over Nigeria, 15 January 2024](figures/forecast_5day_2024.png)
+Limitations
+Preliminary single-season results (small sample). Aurora outputs surface particulate matter while satellite references are column measures - an acknowledged variable mismatch handled via regional/temporal framing. Satellite retrieval over bright desert surfaces and polar-orbiter coverage gaps add observational uncertainty; addressed via the Combined product, QA filtering, and temporal compositing.
 
-Validation reference: CAMS dust aerosol optical depth compared with MODIS Combined
-aerosol optical depth over Nigeria (temporal composites, January 2024):
+Citation and licence
+Code released under the MIT licence (see LICENSE). The Aurora model weights are licensed CC-BY-NC-SA (non-commercial) by Microsoft; respect that licence. AI-assisted coding was used during development; scientific design and interpretation are the author's own.
 
-![CAMS dust-AOD vs MODIS Combined AOD composite over Nigeria](figures/cams_vs_modis_2024.png)
-
-All figures are regenerated by running `python run_case_study.py`.
-
-## Limitations
-
-Preliminary single-season results (small sample). Aurora outputs surface
-particulate matter while satellite references are column measures - an
-acknowledged variable mismatch handled via regional/temporal framing. Satellite
-retrieval over bright desert surfaces and polar-orbiter coverage gaps add
-observational uncertainty; addressed via the Combined product, QA filtering,
-and temporal compositing.
-
-## Citation and licence
-
-Code released under the MIT licence (see LICENSE). The Aurora model weights are
-licensed CC-BY-NC-SA (non-commercial) by Microsoft; respect that licence.
-AI-assisted coding was used during development; scientific design and
-interpretation are the author's own.
-
-## Acknowledgements
-
-Copernicus Atmosphere Monitoring Service (CAMS); NASA (MODIS, Earthdata);
-ESA/Copernicus (Sentinel-5P); Microsoft Research (Aurora).
+Acknowledgements
+Copernicus Atmosphere Monitoring Service (CAMS); NASA (MODIS, Earthdata); ESA/Copernicus (Sentinel-5P); Microsoft Research (Aurora).
