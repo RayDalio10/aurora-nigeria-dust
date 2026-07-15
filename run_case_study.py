@@ -132,9 +132,17 @@ def main():
 
     cache = {}
     def modis_mean(d):
+        # Use a +/- 1-day MODIS composite (3 days of passes) rather than a
+        # single exact day. Single-day polar-orbiter coverage over Nigeria is
+        # too sparse and gappy, which injects noise into the region-average and
+        # collapses the correlation. The windowed composite matches the method
+        # used to produce the documented skill curve. Note: this is a
+        # methodological choice with a real effect on the numbers; the exact
+        # values remain preliminary (n=10) pending the multi-season benchmark.
         if d not in cache:
-            lo, la, ao = satellite.get_modis_aod(
-                d, aod_var=satellite.MODIS_AOD_COMBINED,
+            lo, la, ao = satellite.get_modis_aod_composite(
+                d, window_days=1,
+                aod_var=satellite.MODIS_AOD_COMBINED,
                 qa_var=satellite.MODIS_AOD_COMBINED_QA, qa_min=1)
             cache[d] = float(np.nanmean(ao)) if ao is not None and len(ao) else np.nan
         return cache[d]
