@@ -102,11 +102,13 @@ Do not commit API keys, passwords, `.env` files, `.cdsapirc` files, downloaded d
 ### Run the January 2024 case study
 
 bash
+
   python run_case_study.py
 
 This produces the forecast panels, the skill-vs-lead-time curve, and theevent-detection scores; figures are saved in the output directory.
   
 Run the pilot benchmark:
+
 bash
 
 python run_benchmark.py
