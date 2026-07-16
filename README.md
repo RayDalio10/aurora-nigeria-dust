@@ -108,7 +108,9 @@ This produces the forecast panels, the skill-vs-lead-time curve, and theevent-de
   
 Run the pilot benchmark:
 bash
+
 python run_benchmark.py
+
 python analyze_benchmark.py
 
 The benchmark runner saves one small result file per forecast date under `results/`, allowing interrupted sessions to resume without repeating completed forecasts
