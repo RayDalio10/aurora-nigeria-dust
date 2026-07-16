@@ -27,9 +27,6 @@ the robust, defensible result.
 - Sentinel-5P Absorbing Aerosol Index (Google Earth Engine).
 
 ## Setup
-
-## Setup
-
 1. Install dependencies: `pip install -r requirements.txt`.
 2. Get a free Copernicus ADS API key.
 3. Register for NASA Earthdata.
@@ -62,7 +59,9 @@ python
 import os
 import getpass
 os.environ["CDSAPI_URL"] = "https://ads.atmosphere.copernicus.eu/api"
+
 os.environ["CDSAPI_KEY"] = getpass.getpass("Copernicus ADS key: ")
+
 os.environ["EE_PROJECT"] = getpass.getpass("Google Earth Engine project ID: ")
 
 Earthdata and Earth Engine will prompt for interactive authentication on first use.
