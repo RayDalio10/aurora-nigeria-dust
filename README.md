@@ -28,22 +28,60 @@ the robust, defensible result.
 
 ## Setup
 
-1. Install dependencies: `pip install -r requirements.txt`.
-2. Copernicus ADS: set env vars `CDSAPI_URL` and `CDSAPI_KEY` (get a free key from the ADS site).
-3. NASA Earthdata: register at urs.earthdata.nasa.gov; first run calls an interactive login.
-4. Google Earth Engine: register a project; set EE_PROJECT in src/config.py.
-5. A GPU is required for Aurora inference (the region is cropped to Nigeria to fit free-tier GPUs).
+## Setup
 
-6. Do not commit API keys, passwords, `.env` files, `.cdsapirc` files, downloaded datasets, model checkpoints,
-7. or raw satellite/CAMS files. Credentials should be supplied through environment variables or
-8. interactive authentication only.
+1. Install dependencies: `pip install -r requirements.txt`.
+2. Get a free Copernicus ADS API key.
+3. Register for NASA Earthdata.
+4. Register and enable Google Earth Engine with your own Google Cloud / Earth Engine project ID.
+5. Use a GPU runtime for Aurora inference (the region is cropped to Nigeria to fit free-tier GPUs).
+
+### Notebook setup example
+
+In a fresh Colab or Kaggle session, set the required environment variables before importing the project modules:
+
+```python
+import os
+import sys
+import getpass
+
+# Clone the repository first if needed:
+# !git clone https://github.com/RayDalio10/aurora-nigeria-dust.git
+# !pip install -q -r aurora-nigeria-dust/requirements.txt
+
+os.environ["CDSAPI_URL"] = "https://ads.atmosphere.copernicus.eu/api"
+os.environ["CDSAPI_KEY"] = getpass.getpass("Copernicus ADS key: ")
+os.environ["EE_PROJECT"] = getpass.getpass("Google Earth Engine project ID: ")
+
+sys.path.append("aurora-nigeria-dust/src")
+
+import config, credentials, forecast, satellite, validation as val, plots
+import benchmark_store, benchmark_metrics
+
+credentials.write_cdsapirc_from_env()
+
+Then authenticate Earth Engine and Earthdata when prompted:
+
+satellite.init_earth_engine()
+satellite.init_earthdata()
+
+Do not commit API keys, passwords, .env files, .cdsapirc files, downloaded datasets, model checkpoints, or raw satellite/CAMS files.
+Credentials should be supplied through environment variables or interactive authentication only.
+
+
 
 ## Usage
 
 python run_case_study.py
 
-This produces the forecast panels, the skill-vs-lead-time curve, and the
-event-detection scores; figures are saved in figures/.
+This produces the forecast panels, the skill-vs-lead-time curve, and theevent-detection scores; figures are saved in the output directory.
+
+Run the pilot benchmark:
+
+python run_benchmark.py
+python analyze_benchmark.py
+
+The benchmark runner saves small per-date result records under results/, so interrupted sessions can resume without repeating completed forecasts.
 
 ## Repository layout
 
