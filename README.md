@@ -10,17 +10,10 @@ this project forecasts dust (PM10) over Nigeria from CAMS input data and
 validates the forecasts against independent satellite observations
 (MODIS aerosol optical depth; Sentinel-5P Absorbing Aerosol Index).
 
-Multi-season benchmark result (two Harmattan seasons, 2023/24 and 2024/25;
-26 forecast dates): Aurora shows statistically significant dust-forecast skill
-at 1-2 day lead - Day 1 Pearson r = 0.79 (95% CI 0.42-0.95), Day 2 r = 0.55
-(95% CI 0.15-0.84) - with skill not distinguishable from zero beyond about
-two days. At a 2-day lead the system detects 75% of dust events with a 25%
-false-alarm ratio. This defines a useful early-warning horizon of about 1-2
-days. Results are from a pilot benchmark (n = 26) with wide confidence
-intervals that would tighten with a larger multi-season sample.
+Multi-season benchmark result (two Harmattan seasons, 2023/24 and 2024/25; 26 forecast dates): Aurora shows statistically significant dust-forecast skill
+at 1-2 day lead - Day 1 Pearson r = 0.79 (95% CI 0.42-0.95), Day 2 r = 0.55 (95% CI 0.15-0.84) - with skill not distinguishable from zero beyond about two days. At a 2-day lead the system detects 75% of dust events with a 25% false-alarm ratio. This defines a useful early-warning horizon of about 1-2 days. Results are from a pilot benchmark (n = 26) with wide confidence intervals that would tighten with a larger multi-season sample.
 
-A single-season case study (January 2024, n = 10) gave a higher but
-sample-fragile Day-1 correlation (~0.93); the multi-season benchmark above is
+A single-season case study (January 2024, n = 10) gave a higher but sample-fragile Day-1 correlation (~0.93); the multi-season benchmark above is
 the robust, defensible result.
 
 ## Data sources
@@ -41,7 +34,6 @@ the robust, defensible result.
 ## Usage
 
 python run_case_study.py
-
 
 This produces the forecast panels, the skill-vs-lead-time curve, and the
 event-detection scores; figures are saved in figures/.
@@ -89,20 +81,25 @@ retrieval over bright desert surfaces and polar-orbiter coverage gaps add
 observational uncertainty; addressed via the Combined product, QA filtering,
 and temporal compositing.
 
+
 ## Authorship and provenance
 
-This repository was developed by Samson Adekoya, MSc Data and Information Science student at the University of Ibadan, as part of a research project evaluating AI-based Harmattan dust forecasting and early warning over Nigeria.
+This repository was developed by Samson Adekoya as part of an MSc research project in Data and Information Science at the University of Ibadan.
 
-To the best of the author's knowledge, this is the first open, reproducible evaluation of the Aurora Earth-system foundation model for Harmattan dust forecasting over Nigeria. The repository contains the forecast pipeline, satellite-ingest modules, validation scripts, benchmark runner, and pilot benchmark results.
+To the best of the author's knowledge, this is the first open, reproducible evaluation of the Aurora Earth-system foundation model for Harmattan dust forecasting over Nigeria.
 
-AI-assisted coding was used during development; the scientific design, methodological choices, validation decisions, interpretation, and documentation are the author's own.
+AI-assisted coding was used during implementation. The research question, scientific design, data-source selection, validation methodology, interpretation, and documentation were led by the author
+
 
 ## Citation and licence
 
-Code released under the MIT licence (see LICENSE). The Aurora model weights are
-licensed CC-BY-NC-SA (non-commercial) by Microsoft; respect that licence.
-AI-assisted coding was used during development; scientific design and
-interpretation are the author's own.
+If you use this repository, code, or benchmark, please cite it using the `CITATION.cff` file.
+
+Code in this repository is released under the MIT License.
+
+Benchmark outputs and documentation are intended for release under CC BY 4.0.
+
+This repository does not redistribute Aurora model weights. Users are responsible for complying with the licence terms of the Microsoft Aurora model and all third-party data providers.
 
 ## Acknowledgements
 
