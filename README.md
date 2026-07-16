@@ -56,8 +56,11 @@ Create the required access accounts:
 Before running the code in a notebook or script, set the required environment variables:
 
 python
+
 import os
+
 import getpass
+
 os.environ["CDSAPI_URL"] = "https://ads.atmosphere.copernicus.eu/api"
 
 os.environ["CDSAPI_KEY"] = getpass.getpass("Copernicus ADS key: ")
@@ -71,17 +74,30 @@ Earthdata and Earth Engine will prompt for interactive authentication on first u
 If running from a notebook, add the `src/` directory to the Python path:
 
 python
+
 import sys
+
 sys.path.append("src")
+
 import config
+
 import credentials
+
 import forecast
+
 import satellite
+
 import validation as val
+
 import plots
+
 import benchmark_store
+
 import benchmark_metrics
+
 credentials.write_cdsapirc_from_env()
+
+
 
 Do not commit API keys, passwords, `.env` files, `.cdsapirc` files, downloaded datasets, model checkpoints, or raw satellite/CAMS files.
 
