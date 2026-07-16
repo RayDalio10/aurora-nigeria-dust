@@ -89,6 +89,14 @@ retrieval over bright desert surfaces and polar-orbiter coverage gaps add
 observational uncertainty; addressed via the Combined product, QA filtering,
 and temporal compositing.
 
+## Authorship and provenance
+
+This repository was developed by Samson Adekoya, MSc Data and Information Science student at the University of Ibadan, as part of a research project evaluating AI-based Harmattan dust forecasting and early warning over Nigeria.
+
+To the best of the author's knowledge, this is the first open, reproducible evaluation of the Aurora Earth-system foundation model for Harmattan dust forecasting over Nigeria. The repository contains the forecast pipeline, satellite-ingest modules, validation scripts, benchmark runner, and pilot benchmark results.
+
+AI-assisted coding was used during development; the scientific design, methodological choices, validation decisions, interpretation, and documentation are the author's own.
+
 ## Citation and licence
 
 Code released under the MIT licence (see LICENSE). The Aurora model weights are
