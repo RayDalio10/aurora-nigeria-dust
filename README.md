@@ -27,18 +27,14 @@ the robust, defensible result.
 - Sentinel-5P Absorbing Aerosol Index (Google Earth Engine).
 
 ## Setup
-1. Install dependencies: `pip install -r requirements.txt`.
-2. Get a free Copernicus ADS API key.
-3. Register for NASA Earthdata.
-4. Register and enable Google Earth Engine with your own Google Cloud / Earth Engine project ID.
-5. Use a GPU runtime for Aurora inference (the region is cropped to Nigeria to fit free-tier GPUs).
 
-## Setup
 This project requires Python, a GPU-enabled runtime for Aurora inference, and access to three open data services: Copernicus ADS, NASA Earthdata, and Google Earth Engine.
 
 ### 1. Clone the repository
 bash
+
 git clone https://github.com/RayDalio10/aurora-nigeria-dust.git
+
 cd aurora-nigeria-dust
 
 ### 2. Install dependencies
@@ -106,68 +102,16 @@ Do not commit API keys, passwords, `.env` files, `.cdsapirc` files, downloaded d
 ### Run the January 2024 case study
 
 bash
-python run_benchmark.py
-python analyze_benchmark.py
-
-The benchmark runner saves one small result file per forecast date under `results/`, allowing interrupted sessions to resume without repeating completed forecasts.
-
-
-
-
-
-
-
-
-
-### Notebook setup example
-
-In a fresh Colab or Kaggle session, set the required environment variables before importing the project modules:
-
-python
-import os
-import sys
-import getpass
-Clone the repository first if needed:
-
-!git clone https://github.com/RayDalio10/aurora-nigeria-dust.git
-!pip install -q -r aurora-nigeria-dust/requirements.txt
-
-os.environ["CDSAPI_URL"] = "https://ads.atmosphere.copernicus.eu/api"
-os.environ["CDSAPI_KEY"] = getpass.getpass("Copernicus ADS key: ")
-os.environ["EE_PROJECT"] = getpass.getpass("Google Earth Engine project ID: ")
-
-sys.path.append("aurora-nigeria-dust/src")
-import config, credentials, forecast, satellite, validation as val, plots
-import benchmark_store, benchmark_metrics
-credentials.write_cdsapirc_from_env()
-
-Then authenticate Earth Engine and Earthdata when prompted:
-python
-satellite.init_earth_engine()
-satellite.init_earthdata()
-
-
-Do not commit API keys, passwords, .env files, .cdsapirc files, downloaded datasets, model checkpoints, or raw satellite/CAMS files.
-Credentials should be supplied through environment variables or interactive authentication only.
-
-
-
-## Usage
-
-  Run the case-study script: 
-  bash
   python run_case_study.py
-  
 
 This produces the forecast panels, the skill-vs-lead-time curve, and theevent-detection scores; figures are saved in the output directory.
-
+  
 Run the pilot benchmark:
-
 bash
 python run_benchmark.py
 python analyze_benchmark.py
 
-The benchmark runner saves small per-date result records under results/, so interrupted sessions can resume without repeating completed forecasts.
+The benchmark runner saves one small result file per forecast date under `results/`, allowing interrupted sessions to resume without repeating completed forecasts
 
 
 ## Repository layout
