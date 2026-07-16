@@ -36,6 +36,74 @@ the robust, defensible result.
 4. Register and enable Google Earth Engine with your own Google Cloud / Earth Engine project ID.
 5. Use a GPU runtime for Aurora inference (the region is cropped to Nigeria to fit free-tier GPUs).
 
+## Setup
+This project requires Python, a GPU-enabled runtime for Aurora inference, and access to three open data services: Copernicus ADS, NASA Earthdata, and Google Earth Engine.
+
+### 1. Clone the repository
+bash
+git clone https://github.com/RayDalio10/aurora-nigeria-dust.git
+cd aurora-nigeria-dust
+
+### 2. Install dependencies
+bash
+pip install -r requirements.txt
+
+### 3. Configure credentials
+
+Create the required access accounts:
+
+- Copernicus ADS for CAMS atmospheric data
+- NASA Earthdata for MODIS AOD
+- Google Earth Engine for Sentinel-5P AAI
+
+Before running the code in a notebook or script, set the required environment variables:
+
+python
+import os
+import getpass
+os.environ["CDSAPI_URL"] = "https://ads.atmosphere.copernicus.eu/api"
+os.environ["CDSAPI_KEY"] = getpass.getpass("Copernicus ADS key: ")
+os.environ["EE_PROJECT"] = getpass.getpass("Google Earth Engine project ID: ")
+
+Earthdata and Earth Engine will prompt for interactive authentication on first use.
+
+### 4. Import the project modules
+
+If running from a notebook, add the `src/` directory to the Python path:
+
+python
+import sys
+sys.path.append("src")
+import config
+import credentials
+import forecast
+import satellite
+import validation as val
+import plots
+import benchmark_store
+import benchmark_metrics
+credentials.write_cdsapirc_from_env()
+
+Do not commit API keys, passwords, `.env` files, `.cdsapirc` files, downloaded datasets, model checkpoints, or raw satellite/CAMS files.
+
+## Usage
+
+### Run the January 2024 case study
+
+bash
+python run_benchmark.py
+python analyze_benchmark.py
+
+The benchmark runner saves one small result file per forecast date under `results/`, allowing interrupted sessions to resume without repeating completed forecasts.
+
+
+
+
+
+
+
+
+
 ### Notebook setup example
 
 In a fresh Colab or Kaggle session, set the required environment variables before importing the project modules:
