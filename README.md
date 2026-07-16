@@ -45,11 +45,14 @@ import os
 import sys
 import getpass
 Clone the repository first if needed:
+
 !git clone https://github.com/RayDalio10/aurora-nigeria-dust.git
 !pip install -q -r aurora-nigeria-dust/requirements.txt
+
 os.environ["CDSAPI_URL"] = "https://ads.atmosphere.copernicus.eu/api"
 os.environ["CDSAPI_KEY"] = getpass.getpass("Copernicus ADS key: ")
 os.environ["EE_PROJECT"] = getpass.getpass("Google Earth Engine project ID: ")
+
 sys.path.append("aurora-nigeria-dust/src")
 import config, credentials, forecast, satellite, validation as val, plots
 import benchmark_store, benchmark_metrics
