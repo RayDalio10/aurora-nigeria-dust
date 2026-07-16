@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+title: "Aurora Nigeria Dust: Harmattan Dust Forecasting and Validation"
+message: "If you use this repository, code, or benchmark, please cite it as below."
+type: software
+
+authors:
+  - family-names: Adekoya
+    given-names: Samson
+
+repository-code: "https://github.com/RayDalio10/aurora-nigeria-dust"
+
+abstract: >
+  A reproducible pipeline and benchmark for evaluating the Aurora Earth-system
+  foundation model for Harmattan dust forecasting over Nigeria, including
+  satellite validation with MODIS aerosol optical depth and Sentinel-5P AAI.
+
+keywords:
+  - Aurora
+  - Harmattan
+  - dust forecasting
+  - Nigeria
+  - air quality
+  - early warning
+  - satellite validation
+  - benchmark
+
+license: MIT
+version: "0.1.0-pilot-benchmark"
+date-released: "2026-07-16"
