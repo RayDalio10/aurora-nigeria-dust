@@ -40,30 +40,26 @@ the robust, defensible result.
 
 In a fresh Colab or Kaggle session, set the required environment variables before importing the project modules:
 
-```python
+python
 import os
 import sys
 import getpass
-
-# Clone the repository first if needed:
-# !git clone https://github.com/RayDalio10/aurora-nigeria-dust.git
-# !pip install -q -r aurora-nigeria-dust/requirements.txt
-
+Clone the repository first if needed:
+!git clone https://github.com/RayDalio10/aurora-nigeria-dust.git
+!pip install -q -r aurora-nigeria-dust/requirements.txt
 os.environ["CDSAPI_URL"] = "https://ads.atmosphere.copernicus.eu/api"
 os.environ["CDSAPI_KEY"] = getpass.getpass("Copernicus ADS key: ")
 os.environ["EE_PROJECT"] = getpass.getpass("Google Earth Engine project ID: ")
-
 sys.path.append("aurora-nigeria-dust/src")
-
 import config, credentials, forecast, satellite, validation as val, plots
 import benchmark_store, benchmark_metrics
-
 credentials.write_cdsapirc_from_env()
 
 Then authenticate Earth Engine and Earthdata when prompted:
-
+python
 satellite.init_earth_engine()
 satellite.init_earthdata()
+
 
 Do not commit API keys, passwords, .env files, .cdsapirc files, downloaded datasets, model checkpoints, or raw satellite/CAMS files.
 Credentials should be supplied through environment variables or interactive authentication only.
@@ -72,16 +68,21 @@ Credentials should be supplied through environment variables or interactive auth
 
 ## Usage
 
-python run_case_study.py
+  Run the case-study script: 
+  bash
+  python run_case_study.py
+  
 
 This produces the forecast panels, the skill-vs-lead-time curve, and theevent-detection scores; figures are saved in the output directory.
 
 Run the pilot benchmark:
 
+bash
 python run_benchmark.py
 python analyze_benchmark.py
 
 The benchmark runner saves small per-date result records under results/, so interrupted sessions can resume without repeating completed forecasts.
+
 
 ## Repository layout
 
