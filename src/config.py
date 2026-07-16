@@ -1,4 +1,5 @@
 """Shared configuration: region bounds, CAMS variables, pressure levels, grid."""
+import os
 import numpy as np
 
 # Nigeria / West Africa study domain
@@ -22,7 +23,7 @@ PRESSURE_LEVELS = ["50", "100", "150", "200", "250", "300",
                    "400", "500", "600", "700", "850", "925", "1000"]
 
 # Earth Engine project id (set your own)
-EE_PROJECT = "hidden-ensign-502101-b6"
+EE_PROJECT = os.environ.get("EE_PROJECT", "your-earth-engine-project-id"
 
 # Shared validation grid over Nigeria (0.5-degree boxes)
 GRID_LON = np.arange(2, 15, 0.5)
